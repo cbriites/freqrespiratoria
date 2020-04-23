@@ -1,0 +1,83 @@
+let video;
+let poseNet;
+let pose;
+let data = [{x: 'P6', value: 20}];
+//let chart 
+function setup() {
+   createCanvas(640,480);
+   video = createCapture(VIDEO);
+   video.hide()
+   poseNet = ml5.poseNet(video, modelLoaded);
+   poseNet.on('pose', gotPoses);
+   createChart()
+}
+
+function gotPoses(poses){
+   console.log(poses)
+   if (poses.length > 0){
+     pose = poses[0].pose;
+     skeleton = poses[0].skeleton;
+
+   }
+}
+
+function modelLoaded(){
+   console.log('poseNet ready');
+}
+
+function draw(){
+   image(video, 0, 0);
+
+   if (pose){
+     let eyeR = pose.rightEye;
+     let eyeL = pose.leftEye;
+     let d = dist(eyeR.x, eyeR.y, eyeL.x, eyeL.y);
+
+     //Para os 17 pontos
+     
+     /*for(let i = 0; i < pose.keypoints.length; i++){
+       let x = pose.keypoints[i].position.x;
+       let y = pose.keypoints[i].position.y;
+       fill('blue');
+       ellipse(x,y,2*d/7)
+       }
+ 
+     for (let i=0; i < skeleton.length; i++){
+       let a = skeleton[i][0];
+       let b = skeleton[i][1];
+       strokeWeight(2);
+       stroke('red');
+       line(a.position.x, a.position.y, b.position.x, b.position.y);
+      }  */
+
+     // Para apenas os 2 pontos
+
+     var grafxr = [];
+     var grafyr = [];
+    
+     var grafxl = [];
+     var grafyl = [];
+
+     fill('green');
+     ellipse(pose.rightShoulder.x , pose.rightShoulder.y , 2*d/5);
+     ellipse(pose.leftShoulder.x , pose.leftShoulder.y , 2*d/5);
+
+     var adicionar = grafxr.push(pose.rightShoulder.x );
+     var adicionar = grafyr.push(pose.rightShoulder.y );
+     var adicionar = grafxl.push(pose.leftShoulder.x );
+     var adicionar = grafyl.push(pose.leftShoulder.x );
+
+    
+     //data.append[{x: 'P6', value: 20}]
+
+     line(pose.rightShoulder.x  , pose.rightShoulder.y , pose.leftShoulder.x , pose.leftShoulder.y );
+   }
+   
+}
+
+function createChart(){
+    chart = anychart.line();
+    chart.container("container");
+    var series = chart.line(data);
+    chart.draw();
+}
